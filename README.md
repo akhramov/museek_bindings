@@ -7,7 +7,7 @@ This gem provides bindings for [museek](http://museek-plus.org/) daemon.
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'museek_daemon'
+gem 'museek_bindings'
 ```
 
 And then execute:
@@ -16,7 +16,7 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install museek_daemon
+    $ gem install museek_bindings
 
 ## Usage example
 
@@ -38,7 +38,7 @@ loop do
     message = MuseekBindings::Message::Challenge.new(data: message)
 
     # Interface password, use musetup to find out.
-    pass = 'INTERACE_PASSWORD'
+    pass = 'INTERFACE_PASSWORD'
     # Form the login message
     login = MuseekBindings::Message::Login.new(challenge: message.challenge, password: pass)
 
