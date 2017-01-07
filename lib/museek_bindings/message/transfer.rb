@@ -25,22 +25,22 @@ class MuseekBindings::Message::Transfer < MuseekBindings::Message::Base
 
   as_enum(:state,
           [
-            :finished,
-            :transferring,
-            :negotiating,
-            :waiting,
-            :establishing,
-            :initiating,
-            :connecting,
-            :queued,
-            :aquiring_address,
-            :user_offline,
-            :aborted_by_user,
-            :connection_failure,
-            :aborted,
-            :remote_error,
-            :local_error,
-            :queued
+            'Finished',
+            'Transferring',
+            'Negotiating',
+            'Waiting',
+            'Establishing',
+            'Initiating',
+            'Connecting',
+            'Queued',
+            'Aquiring Address',
+            'User Offline',
+            'Aborted By User',
+            'Connection Failure',
+            'Aborted',
+            'Remote Error',
+            'Local Error',
+            'Queue'
           ],
           source: :_state)
 end
