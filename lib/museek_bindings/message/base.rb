@@ -25,6 +25,12 @@ class MuseekBindings::Message::Base
   private :parse, :dump
 
   class << self
+    # @!method schema
+    #   Retrieve class schema
+    #
+    #   @api private
+    attr_reader :schema
+
     # Defines museekd field, used in parsing.
     #
     # @example Define a string field
@@ -43,9 +49,9 @@ class MuseekBindings::Message::Base
     # @note You should define attributes in order they appear in service response.
     # @since 0.0.1
     def field(name, type:)
-      @_schema ||= []
+      @schema ||= []
 
-      @_schema << { name: name, type: type }
+      schema << { name: name, type: type }
 
       define_getter(name, type)
     end
@@ -94,7 +100,7 @@ class MuseekBindings::Message::Base
     # @see .field how to define parser attributes
     # @since 0.0.1
     def parser
-      @_parser ||= MuseekBindings::Parser.new(@_schema)
+      @_parser ||= MuseekBindings::Parser.new(schema)
     end
 
     # Get a marshaller for current class
@@ -147,6 +153,31 @@ class MuseekBindings::Message::Base
   # @since 0.0.1
   def to_binary
     dump(self)
+  end
+
+  # Convert object to hash
+  #
+  # @example Convert object to hash
+  #   class User < MuseekBindings::Message::Base
+  #     field :name, type: :string
+  #     field :age, type: :uint32
+  #
+  #     def greeting
+  #       "Hello, my name is #{name} and I am #{age}!"
+  #     end
+  #   end
+  #
+  #   User.new(name: 'Silly me', age: 23).to_hash(methods: [:greeting])
+  #
+  # @param methods [Array<Symbol>] additional attributes to be included to result
+  # @return [Hash] the hash representation of object
+  #
+  # @since 0.0.1
+  def to_h(methods: [])
+    attributes = self.class.schema.map { |entry| entry[:name] }
+    keys = [*attributes, *methods]
+
+    Hash[keys.map { |key| [key, public_send(key)] }]
   end
 
   private

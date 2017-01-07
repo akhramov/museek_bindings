@@ -1,7 +1,8 @@
 describe MuseekBindings::Message::Base do
-  let(:subclass) { Class.new(MuseekBindings::Message::Base) }
+  let(:subclass) { Class.new(MuseekBindings::Message::Base, &subclass_block) }
   let(:instance) { subclass.new(**constructor_args) }
   let(:constructor_args) { Hash[] }
+  let(:subclass_block) { -> () { } }
 
   describe '.field' do
     before { subclass.field(field_name, type: type) }
@@ -87,6 +88,43 @@ describe MuseekBindings::Message::Base do
 
     it 'returns string' do
       value(subject).must_be_kind_of String
+    end
+  end
+
+  describe '#to_h' do
+    subject { instance.to_h }
+
+    let(:subclass_block) do
+      ->() { def cool?; true; end }
+    end
+
+    let(:constructor_args) { Hash[user: 'Billy Corgan', awesomeness: 42] }
+
+    before do
+      subclass.field :user, type: :string
+      subclass.field :awesomeness, type: :uint32
+    end
+
+    it 'retrieves schema from class' do
+      assert_send([subclass, :schema])
+    end
+
+    it 'returns hash' do
+      value(subject).must_be_kind_of Hash
+    end
+
+    it 'includes attributes' do
+      value(subject).must_have_keys :user, :awesomeness
+      value(subject[:user]).must_equal 'Billy Corgan'
+    end
+
+    context 'when methods option passed' do
+      subject { instance.to_h(methods: :cool?) }
+
+      it "includes method's call result" do
+        value(subject).must_include(:cool?)
+        value(subject[:cool?]).must_be_true
+      end
     end
   end
 end
